@@ -1,0 +1,14 @@
+**/bin
+**/obj
+**/.vs
+**/.idea
+.git
+.github
+.gitignore
+.dockerignore
+.editorconfig
+docker
+*.md
+LICENSE
+.env
+.env.*

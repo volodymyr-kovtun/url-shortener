@@ -1,0 +1,71 @@
+## .NET / Visual Studio
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.userprefs
+
+[Bb]in/
+[Oo]bj/
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+[Bb]uild/
+[Ll]og/
+artifacts/
+publish/
+
+.vs/
+.vscode/
+.idea/
+*.sln.iml
+
+# JetBrains Rider / ReSharper
+_ReSharper*/
+*.[Rr]e[Ss]harper
+*.DotSettings.user
+
+# Build outputs
+*.pdb
+*.dll
+*.exe
+*.log
+*.tmp
+
+# NuGet
+*.nupkg
+**/packages/*
+!**/packages/build/
+*.nuget.props
+*.nuget.targets
+
+# Publish profiles (sensitive)
+*.pubxml
+*.publishproj
+*.publishsettings
+*.azurePubxml
+PublishScripts/
+
+# Local secrets / env files
+.env
+.env.*
+!.env.example
+appsettings.*.local.json
+secrets.json
+
+# Coverage & test results
+[Tt]est[Rr]esult*/
+coverage*.json
+coverage*.xml
+*.coverage
+*.coveragexml
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker volumes
+data/

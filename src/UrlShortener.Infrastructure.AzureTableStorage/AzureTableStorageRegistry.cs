@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using UrlShortener.Core;
 using UrlShortener.Infrastructure.AzureTableStorage.Configuration;
 
@@ -12,15 +13,17 @@ public static class AzureTableStorageRegistry
 
     public static IServiceCollection AddAzureTableStorage(this IServiceCollection services, IConfiguration configuration)
     {
-        var settings = configuration.GetSection(ConfigSection).Get<AzureTableStorageSettings>()
-            ?? throw new InvalidOperationException($"'{ConfigSection}' configuration section is missing.");
+        services
+            .AddOptions<AzureTableStorageSettings>()
+            .Bind(configuration.GetSection(ConfigSection))
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
 
-        if (string.IsNullOrWhiteSpace(settings.ConnectionString))
+        services.AddSingleton<IStorageProvider<UrlMapping, string>>(sp =>
         {
-            throw new InvalidOperationException($"'{ConfigSection}:ConnectionString' must be set.");
-        }
-
-        services.AddScoped<IStorageProvider<UrlMapping, string>>(_ => new AzureTableStorageProvider(settings.ConnectionString));
+            var settings = sp.GetRequiredService<IOptions<AzureTableStorageSettings>>().Value;
+            return new AzureTableStorageProvider(settings.ConnectionString);
+        });
 
         return services;
     }

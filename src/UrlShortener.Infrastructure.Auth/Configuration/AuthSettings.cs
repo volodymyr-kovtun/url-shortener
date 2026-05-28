@@ -1,6 +1,9 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace UrlShortener.Infrastructure.Auth.Configuration;
 
-public class AuthSettings
+public sealed class AuthSettings
 {
-    public string ApiKey { get; init; } = default!;
+    [Required(AllowEmptyStrings = false)]
+    public required string ApiKey { get; init; }
 }

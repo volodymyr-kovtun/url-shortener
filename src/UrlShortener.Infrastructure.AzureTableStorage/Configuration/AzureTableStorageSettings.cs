@@ -1,6 +1,9 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace UrlShortener.Infrastructure.AzureTableStorage.Configuration;
 
 public sealed class AzureTableStorageSettings
 {
-    public string ConnectionString { get; init; } = default!;
+    [Required(AllowEmptyStrings = false)]
+    public required string ConnectionString { get; init; }
 }

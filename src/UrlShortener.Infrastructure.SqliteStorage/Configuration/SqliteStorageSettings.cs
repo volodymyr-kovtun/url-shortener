@@ -1,6 +1,9 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace UrlShortener.Infrastructure.SqliteStorage.Configuration;
 
 public sealed class SqliteStorageSettings
 {
-    public string ConnectionString { get; init; } = default!;
+    [Required(AllowEmptyStrings = false)]
+    public required string ConnectionString { get; init; }
 }

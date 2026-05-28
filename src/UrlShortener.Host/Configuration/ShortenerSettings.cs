@@ -1,6 +1,9 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace UrlShortener.Host.Configuration;
 
-public class ShortenerSettings
+public sealed class ShortenerSettings
 {
-    public string Domain { get; set; } = default!;
+    [Required(AllowEmptyStrings = false)]
+    public required string Domain { get; init; }
 }

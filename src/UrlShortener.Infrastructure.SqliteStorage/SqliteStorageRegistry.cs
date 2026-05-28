@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using UrlShortener.Core;
 using UrlShortener.Infrastructure.SqliteStorage.Configuration;
 using UrlShortener.Infrastructure.SqliteStorage.Persistence;
@@ -14,15 +15,18 @@ public static class SqliteStorageRegistry
 
     public static IServiceCollection AddSqliteStorage(this IServiceCollection services, IConfiguration configuration)
     {
-        var settings = configuration.GetSection(ConfigSection).Get<SqliteStorageSettings>()
-            ?? throw new InvalidOperationException($"'{ConfigSection}' configuration section is missing.");
+        services
+            .AddOptions<SqliteStorageSettings>()
+            .Bind(configuration.GetSection(ConfigSection))
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
 
-        if (string.IsNullOrWhiteSpace(settings.ConnectionString))
+        services.AddDbContext<UrlShortenerDbContext>((sp, options) =>
         {
-            throw new InvalidOperationException($"'{ConfigSection}:ConnectionString' must be set.");
-        }
+            var settings = sp.GetRequiredService<IOptions<SqliteStorageSettings>>().Value;
+            options.UseSqlite(settings.ConnectionString);
+        });
 
-        services.AddDbContext<UrlShortenerDbContext>(options => options.UseSqlite(settings.ConnectionString));
         services.AddScoped<IStorageProvider<UrlMapping, string>, SqliteStorageProvider>();
         services.AddHostedService<SqliteDatabaseInitializer>();
 

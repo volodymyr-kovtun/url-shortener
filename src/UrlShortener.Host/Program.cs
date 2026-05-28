@@ -3,19 +3,12 @@ using Microsoft.OpenApi.Models;
 using UrlShortener.Core;
 using UrlShortener.Host.Configuration;
 using UrlShortener.Host.Controllers;
+using UrlShortener.Host.Storage;
 using UrlShortener.Host.Swagger;
 using UrlShortener.Infrastructure.Auth;
 using UrlShortener.Infrastructure.Auth.Configuration;
-using UrlShortener.Infrastructure.AzureTableStorage;
 
 var builder = WebApplication.CreateBuilder(args);
-
-var azureTableStorageConnectionString = builder.Configuration.GetConnectionString("AzureTableStorageConnectionString");
-
-if (string.IsNullOrWhiteSpace(azureTableStorageConnectionString))
-{
-    throw new InvalidOperationException("Azure Table Storage connection string is not configured (ConnectionStrings:AzureTableStorageConnectionString).");
-}
 
 var apiKey = builder.Configuration.GetSection("Auth")["ApiKey"];
 
@@ -27,7 +20,7 @@ if (string.IsNullOrWhiteSpace(apiKey))
 builder.Services
     .Configure<ShortenerSettings>(builder.Configuration.GetRequiredSection("Shortener"))
     .Configure<AuthSettings>(builder.Configuration.GetRequiredSection("Auth"))
-    .AddScoped<IStorageProvider<UrlMapping, string>>(_ => new AzureTableStorageProvider(azureTableStorageConnectionString))
+    .AddStorage(builder.Configuration)
     .AddScoped<IUrlShortenerService, UrlShortenerService>()
     .AddHttpContextAccessor()
     .AddAuth();

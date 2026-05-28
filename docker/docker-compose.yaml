@@ -1,27 +1,19 @@
 services:
-  azurite:
-    image: mcr.microsoft.com/azure-storage/azurite
-    container_name: urlshortener-azurite
-    command: "azurite-table --tableHost 0.0.0.0 --tablePort 10002 --location /data --skipApiVersionCheck"
-    ports:
-      - "10002:10002"
-    volumes:
-      - azurite_data:/data
-
   api:
     build:
       context: ../src
       dockerfile: UrlShortener.Host/Dockerfile
     container_name: urlshortener-api
-    depends_on:
-      - azurite
     ports:
       - "8080:8080"
     environment:
       ASPNETCORE_ENVIRONMENT: Development
-      ConnectionStrings__AzureTableStorageConnectionString: "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;TableEndpoint=http://azurite:10002/devstoreaccount1;"
+      Storage__Provider: Sqlite
+      Storage__Sqlite__ConnectionString: "Data Source=/data/urlshortener.db"
       Auth__ApiKey: ${API_KEY:?API_KEY must be set in docker/.env}
       Shortener__Domain: "http://localhost:8080"
+    volumes:
+      - sqlite_data:/data
 
 volumes:
-  azurite_data:
+  sqlite_data:

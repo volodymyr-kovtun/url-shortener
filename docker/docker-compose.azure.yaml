@@ -1,0 +1,34 @@
+# Alternative compose file that uses Azure Table Storage (via the Azurite emulator)
+# instead of the default SQLite backend.
+#
+# Usage:
+#   docker compose -f docker/docker-compose.azure.yaml --env-file docker/.env up --build
+
+services:
+  azurite:
+    image: mcr.microsoft.com/azure-storage/azurite
+    container_name: urlshortener-azurite
+    command: "azurite-table --tableHost 0.0.0.0 --tablePort 10002 --location /data --skipApiVersionCheck"
+    ports:
+      - "10002:10002"
+    volumes:
+      - azurite_data:/data
+
+  api:
+    build:
+      context: ../src
+      dockerfile: UrlShortener.Host/Dockerfile
+    container_name: urlshortener-api
+    depends_on:
+      - azurite
+    ports:
+      - "8080:8080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      Storage__Provider: AzureTableStorage
+      Storage__AzureTableStorage__ConnectionString: "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;TableEndpoint=http://azurite:10002/devstoreaccount1;"
+      Auth__ApiKey: ${API_KEY:?API_KEY must be set in docker/.env}
+      Shortener__Domain: "http://localhost:8080"
+
+volumes:
+  azurite_data:

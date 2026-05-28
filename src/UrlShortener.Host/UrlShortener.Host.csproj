@@ -12,6 +12,7 @@
       <ProjectReference Include="..\UrlShortener.Core\UrlShortener.Core.csproj" />
       <ProjectReference Include="..\UrlShortener.Infrastructure.Auth\UrlShortener.Infrastructure.Auth.csproj" />
       <ProjectReference Include="..\UrlShortener.Infrastructure.AzureTableStorage\UrlShortener.Infrastructure.AzureTableStorage.csproj" />
+      <ProjectReference Include="..\UrlShortener.Infrastructure.SqliteStorage\UrlShortener.Infrastructure.SqliteStorage.csproj" />
     </ItemGroup>
 
     <ItemGroup>

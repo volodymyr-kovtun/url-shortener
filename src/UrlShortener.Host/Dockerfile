@@ -5,6 +5,7 @@ COPY UrlShortener.sln ./
 COPY UrlShortener.Core/UrlShortener.Core.csproj UrlShortener.Core/
 COPY UrlShortener.Infrastructure.Auth/UrlShortener.Infrastructure.Auth.csproj UrlShortener.Infrastructure.Auth/
 COPY UrlShortener.Infrastructure.AzureTableStorage/UrlShortener.Infrastructure.AzureTableStorage.csproj UrlShortener.Infrastructure.AzureTableStorage/
+COPY UrlShortener.Infrastructure.SqliteStorage/UrlShortener.Infrastructure.SqliteStorage.csproj UrlShortener.Infrastructure.SqliteStorage/
 COPY UrlShortener.Host/UrlShortener.Host.csproj UrlShortener.Host/
 RUN dotnet restore UrlShortener.sln
 

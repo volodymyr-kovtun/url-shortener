@@ -9,7 +9,8 @@ public class ApiKeyHandler(IHttpContextAccessor contextAccessor, IApiKeyValidato
 
     protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, ApiKeyRequirement requirement)
     {
-        if (!contextAccessor?.HttpContext?.Request.Headers.TryGetValue(ApiKeyHeaderName, out var apiKey) ?? false)
+        var httpContext = contextAccessor.HttpContext;
+        if (httpContext is null || !httpContext.Request.Headers.TryGetValue(ApiKeyHeaderName, out var apiKey))
         {
             context.Fail();
             return Task.CompletedTask;

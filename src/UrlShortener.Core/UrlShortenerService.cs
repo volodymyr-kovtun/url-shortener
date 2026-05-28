@@ -20,6 +20,11 @@ public sealed class UrlShortenerService(
         LocalCacheExpiration = TimeSpan.FromMinutes(10),
     };
 
+    private static readonly HybridCacheEntryOptions CacheReadOnlyOptions = new()
+    {
+        Flags = HybridCacheEntryFlags.DisableUnderlyingData
+    };
+
     public async Task<string> ShortenUrlAsync(string url, string? prefix, CancellationToken ct = default)
     {
         var shortCode = GenerateShortCode();
@@ -29,17 +34,29 @@ public sealed class UrlShortenerService(
         return shortCode;
     }
 
-    public async Task<string?> GetOriginalUrlAsync(string shortUrl, CancellationToken ct = default) =>
-        await cache.GetOrCreateAsync(
-            CacheKeyPrefix + shortUrl,
-            (storageProvider, shortUrl),
-            static async (state, cancellationToken) =>
-            {
-                var entity = await state.storageProvider.GetAsync(state.shortUrl, cancellationToken);
-                return entity?.OriginalUrl;
-            },
-            CacheOptions,
+    public async Task<string?> GetOriginalUrlAsync(string shortUrl, CancellationToken ct = default)
+    {
+        var cacheKey = CacheKeyPrefix + shortUrl;
+        var cachedUrl = await cache.GetOrCreateAsync<string?>(
+            cacheKey,
+            static _ => ValueTask.FromResult<string?>(null),
+            CacheReadOnlyOptions,
             cancellationToken: ct);
+
+        if (cachedUrl is not null)
+        {
+            return cachedUrl;
+        }
+
+        var entity = await storageProvider.GetAsync(shortUrl, ct);
+        if (entity is null)
+        {
+            return null;
+        }
+
+        await cache.SetAsync(cacheKey, entity.OriginalUrl, CacheOptions, cancellationToken: ct);
+        return entity.OriginalUrl;
+    }
 
     private static string GenerateShortCode() => Guid.NewGuid().ToString("N")[..8];
 }

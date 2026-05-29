@@ -1,5 +1,3 @@
-using System.Security.Cryptography;
-using System.Text;
 using Azure.Data.Tables;
 using UrlShortener.Core;
 
@@ -11,13 +9,6 @@ public sealed class AzureTableStorageProvider(string connectionString) : IStorag
 
     private readonly TableClient _tableClient = new(connectionString, UrlMappingTableName);
 
-    private static string GetHashedPartitionKey(string shortUrl)
-    {
-        Span<byte> hash = stackalloc byte[SHA256.HashSizeInBytes];
-        SHA256.HashData(Encoding.UTF8.GetBytes(shortUrl), hash);
-        return Convert.ToHexStringLower(hash[..2]);
-    }
-
     public async Task AddAsync(UrlMapping entity, CancellationToken ct = default)
     {
         var dbEntity = new UrlMappingEntity
@@ -25,7 +16,7 @@ public sealed class AzureTableStorageProvider(string connectionString) : IStorag
             OriginalUrl = entity.OriginalUrl,
             RowKey = entity.ShortUrl,
             ShortUrl = entity.ShortUrl,
-            PartitionKey = GetHashedPartitionKey(entity.ShortUrl),
+            PartitionKey = PartitionKeyHasher.Hash(entity.ShortUrl),
             Timestamp = entity.CreatedAt,
         };
 
@@ -35,7 +26,7 @@ public sealed class AzureTableStorageProvider(string connectionString) : IStorag
 
     public async Task<UrlMapping?> GetAsync(string key, CancellationToken ct = default)
     {
-        var partitionKey = GetHashedPartitionKey(key);
+        var partitionKey = PartitionKeyHasher.Hash(key);
 
         var dbEntity = await _tableClient.GetEntityAsync<UrlMappingEntity>(partitionKey, key, cancellationToken: ct);
 

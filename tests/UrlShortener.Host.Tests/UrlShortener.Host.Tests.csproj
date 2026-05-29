@@ -1,0 +1,7 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\UrlShortener.Host\UrlShortener.Host.csproj" />
+  </ItemGroup>
+
+</Project>

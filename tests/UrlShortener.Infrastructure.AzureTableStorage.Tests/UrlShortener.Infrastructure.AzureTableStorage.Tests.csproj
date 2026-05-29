@@ -1,0 +1,7 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\UrlShortener.Infrastructure.AzureTableStorage\UrlShortener.Infrastructure.AzureTableStorage.csproj" />
+  </ItemGroup>
+
+</Project>
